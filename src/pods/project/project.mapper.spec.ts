@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { mapProjectFromApiToVm } from './project.mapper';
+import {
+  mapProjectFromApiToVm,
+  mapEmployeeSummaryFromApiToVm,
+  mapEmployeeSummaryListFromApiToVm,
+} from './project.mapper';
 import * as viewModel from './project.vm';
 import * as apiModel from './api/project.api-model';
 
@@ -147,4 +151,123 @@ describe('mapProjectFromApiToVm', () => {
       expect(result).toEqual(expectedVmProject);
     }
   );
+});
+
+describe('mapEmployeeSummaryFromApiToVm', () => {
+  it.each<{
+    apiEmployee: apiModel.EmployeeSummary;
+    expected: viewModel.EmployeeSummary;
+    description: string;
+  }>([
+    {
+      apiEmployee: {
+        id: 'emp-1',
+        employeeName: 'John Doe',
+        isAssigned: true,
+      },
+      expected: {
+        id: 'emp-1',
+        employeeName: 'John Doe',
+        isAssigned: true,
+      },
+      description: 'complete employee',
+    },
+    {
+      apiEmployee: {
+        id: 'emp-2',
+        employeeName: 'Jane Smith',
+        isAssigned: undefined,
+      },
+      expected: {
+        id: 'emp-2',
+        employeeName: 'Jane Smith',
+        isAssigned: undefined,
+      },
+      description: 'employee with undefined isAssigned',
+    },
+    {
+      apiEmployee: {
+        id: 'emp-3',
+        employeeName: 'Bob Johnson',
+        isAssigned: null,
+      },
+      expected: {
+        id: 'emp-3',
+        employeeName: 'Bob Johnson',
+        isAssigned: null,
+      },
+      description: 'employee with null isAssigned',
+    },
+    {
+      apiEmployee: {
+        id: 'emp-4',
+        employeeName: 'Alice Brown',
+      },
+      expected: {
+        id: 'emp-4',
+        employeeName: 'Alice Brown',
+      },
+      description: 'employee without isAssigned property',
+    },
+  ])('should map $description correctly', ({ apiEmployee, expected }) => {
+    // Act
+    const result = mapEmployeeSummaryFromApiToVm(apiEmployee);
+
+    // Assert
+    expect(result).toEqual(expected);
+  });
+});
+
+describe('mapEmployeeSummaryListFromApiToVm', () => {
+  it.each<{
+    apiEmployees: apiModel.EmployeeSummary[];
+    expected: viewModel.EmployeeSummary[];
+    description: string;
+  }>([
+    {
+      apiEmployees: [],
+      expected: [],
+      description: 'empty array',
+    },
+    {
+      apiEmployees: null,
+      expected: [],
+      description: 'null array',
+    },
+    {
+      apiEmployees: undefined,
+      expected: [],
+      description: 'undefined array',
+    },
+    {
+      apiEmployees: [
+        { id: 'emp-1', employeeName: 'John Doe', isAssigned: true },
+        { id: 'emp-2', employeeName: 'Jane Smith', isAssigned: false },
+      ],
+      expected: [
+        { id: 'emp-1', employeeName: 'John Doe', isAssigned: true },
+        { id: 'emp-2', employeeName: 'Jane Smith', isAssigned: false },
+      ],
+      description: 'array with valid employees',
+    },
+    {
+      apiEmployees: [
+        { id: 'emp-1', employeeName: 'John Doe', isAssigned: undefined },
+        { id: 'emp-2', employeeName: 'Jane Smith', isAssigned: null },
+        { id: 'emp-3', employeeName: 'Bob Johnson' },
+      ],
+      expected: [
+        { id: 'emp-1', employeeName: 'John Doe', isAssigned: undefined },
+        { id: 'emp-2', employeeName: 'Jane Smith', isAssigned: null },
+        { id: 'emp-3', employeeName: 'Bob Johnson' },
+      ],
+      description: 'array with employees having undefined/null properties',
+    },
+  ])('should map $description correctly', ({ apiEmployees, expected }) => {
+    // Act
+    const result = mapEmployeeSummaryListFromApiToVm(apiEmployees);
+
+    // Assert
+    expect(result).toEqual(expected);
+  });
 });
