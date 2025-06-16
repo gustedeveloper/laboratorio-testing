@@ -54,89 +54,97 @@ describe('mapProjectFromApiToVm', () => {
     }
   );
 
-  it('should map a project with no employees correctly', () => {
-    // Arrange
-    const apiProject: apiModel.Project = {
-      id: 'project-1',
-      name: 'Test Project Alpha',
-      externalId: 'ext-alpha',
-      comments: 'Comments for Alpha',
-      isActive: true,
-      employees: [],
-    };
-
-    const expectedVmProject: viewModel.Project = {
-      id: 'project-1',
-      name: 'Test Project Alpha',
-      externalId: 'ext-alpha',
-      comments: 'Comments for Alpha',
-      isActive: true,
-      employees: [],
-    };
-
-    // Act
-    const result = mapProjectFromApiToVm(apiProject);
-
-    // Assert
-    expect(result).toEqual(expectedVmProject);
-  });
-
-  it('should map a project with undefined employees correctly', () => {
-    // Arrange
-    const apiProject: apiModel.Project = {
-      id: 'project-1',
-      name: 'Test Project Alpha',
-      externalId: 'ext-alpha',
-      comments: 'Comments for Alpha',
-      isActive: true,
-      employees: undefined,
-    };
-
-    const expectedVmProject: viewModel.Project = {
-      id: 'project-1',
-      name: 'Test Project Alpha',
-      externalId: 'ext-alpha',
-      comments: 'Comments for Alpha',
-      isActive: true,
-      employees: [],
-    };
-    // Act
-    const result = mapProjectFromApiToVm(apiProject);
-
-    // Assert
-    expect(result).toEqual(expectedVmProject);
-  });
-
-  it('should map a project with employees correctly', () => {
-    // Arrange
-    const apiProject: apiModel.Project = {
-      id: 'project-2',
-      name: 'Test Project Beta',
-      externalId: 'ext-beta',
-      comments: 'Comments for Beta',
-      isActive: false,
-      employees: [
-        { id: 'emp-100', employeeName: 'John Doe', isAssigned: true },
-        { id: 'emp-101', employeeName: 'Jane Roe', isAssigned: false },
+  it.each<{
+    apiProject: apiModel.Project;
+    expectedEmployees: viewModel.EmployeeSummary[];
+    description: string;
+  }>([
+    {
+      apiProject: {
+        id: 'project-1',
+        name: 'Test Project 1',
+        externalId: '1',
+        comments: 'Comments for project 1',
+        isActive: true,
+        employees: [],
+      },
+      expectedEmployees: [],
+      description: 'empty employees array',
+    },
+    {
+      apiProject: {
+        id: 'project-1',
+        name: 'Test Project 1',
+        externalId: '1',
+        comments: 'Comments for project 1',
+        isActive: true,
+        employees: undefined,
+      },
+      expectedEmployees: [],
+      description: 'undefined employees',
+    },
+    {
+      apiProject: {
+        id: 'project-1',
+        name: 'Test Project 1',
+        externalId: '1',
+        comments: 'Comments for project 1',
+        isActive: true,
+        employees: null,
+      },
+      expectedEmployees: [],
+      description: 'null employees',
+    },
+    {
+      apiProject: {
+        id: 'project-2',
+        name: 'Test Project 2',
+        externalId: '2',
+        comments: 'Comments for project 2',
+        isActive: false,
+        employees: [
+          { id: 'emp0', employeeName: 'John Doe', isAssigned: true },
+          { id: 'emp1', employeeName: 'Jane Roe', isAssigned: false },
+        ],
+      },
+      expectedEmployees: [
+        { id: 'emp0', employeeName: 'John Doe', isAssigned: true },
+        { id: 'emp1', employeeName: 'Jane Roe', isAssigned: false },
       ],
-    };
-
-    const expectedVmProject: viewModel.Project = {
-      id: 'project-2',
-      name: 'Test Project Beta',
-      externalId: 'ext-beta',
-      comments: 'Comments for Beta',
-      isActive: false,
-      employees: [
-        { id: 'emp-100', employeeName: 'John Doe', isAssigned: true },
-        { id: 'emp-101', employeeName: 'Jane Roe', isAssigned: false },
+      description: 'populated employees array',
+    },
+    {
+      apiProject: {
+        id: 'project-3',
+        name: 'Test Project 3',
+        externalId: '3',
+        comments: 'Comments for project 3',
+        isActive: true,
+        employees: [
+          { id: 'emp0', employeeName: 'Alice Smith', isAssigned: undefined },
+          { id: 'emp1', employeeName: 'Bob Johnson', isAssigned: null },
+        ],
+      },
+      expectedEmployees: [
+        { id: 'emp0', employeeName: 'Alice Smith', isAssigned: undefined },
+        { id: 'emp1', employeeName: 'Bob Johnson', isAssigned: null },
       ],
-    };
+      description: 'employees with undefined/null properties',
+    },
+  ])(
+    'should map a project with $description correctly',
+    ({ apiProject, expectedEmployees }) => {
+      // Arrange
+      const expectedVmProject: viewModel.Project = {
+        ...apiProject,
+        employees: expectedEmployees,
+      };
 
-    // Act
-    const result = mapProjectFromApiToVm(apiProject);
+      // Act
+      const result = mapProjectFromApiToVm(apiProject);
 
-    // Assert
-    expect(result).toEqual(expectedVmProject);
-  });
+      // Assert
+      expect(result).toEqual(expectedVmProject);
+    }
+  );
 });
