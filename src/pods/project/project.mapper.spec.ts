@@ -10,6 +10,8 @@ describe('mapProjectFromApiToVm', () => {
     { apiProject: '', description: 'empty string' },
     { apiProject: 0, description: 'zero' },
     { apiProject: false, description: 'false' },
+    { apiProject: [], description: 'empty array' },
+    { apiProject: {}, description: 'empty object' },
   ])(
     'should return an empty project if input project is $description',
     ({ apiProject }) => {
@@ -25,15 +27,30 @@ describe('mapProjectFromApiToVm', () => {
   );
 
   it.each<{ apiProject: any; description: string }>([
-    { apiProject: [], description: 'empty array' },
-    { apiProject: {}, description: 'empty object' },
+    { apiProject: { name: 'Test' }, description: 'object without id property' },
+    {
+      apiProject: { id: 123, name: 'Test' },
+      description: 'object with non-string id',
+    },
+    {
+      apiProject: { id: null, name: 'Test' },
+      description: 'object with null id',
+    },
+    {
+      apiProject: { id: '', name: 'Test' },
+      description: 'object with empty string id',
+    },
   ])(
-    'should attempt to map project even if input is $description (will likely fail)',
+    'should return an empty project if input is $description',
     ({ apiProject }) => {
-      // Arrange & Act & Assert
-      // These cases will attempt to spread the array/object as a project
-      // This test documents the current behavior (which might be unexpected)
-      expect(() => mapProjectFromApiToVm(apiProject)).not.toThrow();
+      // Arrange
+      const expectedEmptyProject = viewModel.createEmptyProject();
+
+      // Act
+      const result = mapProjectFromApiToVm(apiProject);
+
+      // Assert
+      expect(result).toEqual(expectedEmptyProject);
     }
   );
 

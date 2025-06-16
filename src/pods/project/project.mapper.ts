@@ -11,12 +11,23 @@ const mapEmployeeSummaryFromApiToVm = (
 const mapEmployeeSummaryListFromApiToVm = (
   employeeSummary: apiModel.EmployeeSummary[]
 ): viewModel.EmployeeSummary[] =>
-  mapToCollection(employeeSummary, es => mapEmployeeSummaryFromApiToVm(es));
+  mapToCollection(employeeSummary, (es) => mapEmployeeSummaryFromApiToVm(es));
+
+const isValidProject = (project: any): project is apiModel.Project => {
+  return (
+    project !== null &&
+    project !== undefined &&
+    typeof project === 'object' &&
+    !Array.isArray(project) &&
+    typeof project.id === 'string' &&
+    project.id.length > 0
+  );
+};
 
 export const mapProjectFromApiToVm = (
   project: apiModel.Project
 ): viewModel.Project => {
-  return Boolean(project)
+  return isValidProject(project)
     ? {
         ...project,
         employees: mapEmployeeSummaryListFromApiToVm(project.employees),
