@@ -47,4 +47,35 @@ describe('ConfirmationDialogComponent', () => {
       }
     });
   });
+
+  describe('Dynamic content rendering', () => {
+    it.each([
+      {
+        title: 'Simple String Title',
+        type: 'string',
+        expectedText: 'Simple String Title',
+      },
+      {
+        title: <h2>React Node Title</h2>,
+        type: 'ReactNode',
+        expectedText: 'React Node Title',
+      },
+      {
+        title: 'Titles with accents: áéíóú',
+        type: 'special characters',
+        expectedText: 'Titles with accents: áéíóú',
+      },
+    ])('should render title as $type correctly', ({ title, expectedText }) => {
+      // Arrange
+      const mockProps = createMockProps({ title });
+
+      // Act
+      render(<ConfirmationDialogComponent {...mockProps} />);
+
+      // Assert
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+      expect(screen.getByText(expectedText)).toBeInTheDocument();
+    });
+  });
 });
