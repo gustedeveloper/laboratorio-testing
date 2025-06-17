@@ -77,5 +77,29 @@ describe('ConfirmationDialogComponent', () => {
       expect(dialog).toBeInTheDocument();
       expect(screen.getByText(expectedText)).toBeInTheDocument();
     });
+
+    it.each([
+      { closeButton: 'Cancelar', acceptButton: 'Aceptar' },
+      { closeButton: 'Close', acceptButton: 'Confirm' },
+      { closeButton: '❌ Cancel', acceptButton: '✅ Accept' },
+    ])(
+      'should render custom button labels',
+      ({ closeButton, acceptButton }) => {
+        // Arrange
+        const mockProps = createMockProps({
+          labels: { closeButton, acceptButton },
+        });
+
+        // Act
+        render(<ConfirmationDialogComponent {...mockProps} />);
+
+        // Assert
+        const closeBtn = screen.getByRole('button', { name: closeButton });
+        const acceptBtn = screen.getByRole('button', { name: acceptButton });
+
+        expect(closeBtn).toBeInTheDocument();
+        expect(acceptBtn).toBeInTheDocument();
+      }
+    );
   });
 });
