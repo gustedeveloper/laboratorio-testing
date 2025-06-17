@@ -111,7 +111,9 @@ describe('ConfirmationDialogComponent', () => {
 
       // Act
       render(<ConfirmationDialogComponent {...mockProps} />);
-      const closeButton = screen.getByRole('button', { name: 'Cancel' });
+      const closeButton = screen.getByRole('button', {
+        name: mockProps.labels.closeButton,
+      });
       fireEvent.click(closeButton);
 
       // Assert
@@ -140,4 +142,46 @@ describe('ConfirmationDialogComponent', () => {
       expect(mockOnAccept).toHaveBeenCalledBefore(mockOnClose);
     });
   });
+});
+
+describe('Dynamic children content rendering', () => {
+  it.each([
+    {
+      children: 'Simple text content',
+      type: 'text',
+      expectedTexts: ['Simple text content'],
+    },
+    {
+      children: <p>Paragraph content</p>,
+      type: 'single element',
+      expectedTexts: ['Paragraph content'],
+    },
+    {
+      children: (
+        <div>
+          <p>Multiple</p>
+          <span>Elements</span>
+        </div>
+      ),
+      type: 'multiple elements',
+      expectedTexts: ['Multiple', 'Elements'],
+    },
+  ])(
+    'should render $type children correctly',
+    ({ children, expectedTexts }) => {
+      // Arrange
+      const mockProps = createMockProps({ children });
+
+      // Act
+      render(<ConfirmationDialogComponent {...mockProps} />);
+
+      // Assert
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toBeInTheDocument();
+
+      expectedTexts.forEach((text) => {
+        expect(screen.getByText(text)).toBeInTheDocument();
+      });
+    }
+  );
 });
