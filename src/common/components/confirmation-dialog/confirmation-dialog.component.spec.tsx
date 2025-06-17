@@ -117,5 +117,27 @@ describe('ConfirmationDialogComponent', () => {
       // Assert
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
+
+    it('should call both onAccept and onClose when accept button is clicked', () => {
+      // Arrange
+      const mockOnAccept = vi.fn();
+      const mockOnClose = vi.fn();
+      const mockProps = createMockProps({
+        onAccept: mockOnAccept,
+        onClose: mockOnClose,
+      });
+
+      // Act
+      render(<ConfirmationDialogComponent {...mockProps} />);
+      const acceptButton = screen.getByRole('button', {
+        name: mockProps.labels.acceptButton,
+      });
+      fireEvent.click(acceptButton);
+
+      // Assert
+      expect(mockOnAccept).toHaveBeenCalledTimes(1);
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+      expect(mockOnAccept).toHaveBeenCalledBefore(mockOnClose);
+    });
   });
 });
