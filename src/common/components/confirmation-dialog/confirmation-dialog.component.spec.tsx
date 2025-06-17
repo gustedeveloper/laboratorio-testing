@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { ConfirmationDialogComponent } from './confirmation-dialog.component';
 
@@ -56,7 +56,7 @@ describe('ConfirmationDialogComponent', () => {
         expectedText: 'Simple String Title',
       },
       {
-        title: <h2>React Node Title</h2>,
+        title: <span>React Node Title</span>,
         type: 'ReactNode',
         expectedText: 'React Node Title',
       },
@@ -101,5 +101,21 @@ describe('ConfirmationDialogComponent', () => {
         expect(acceptBtn).toBeInTheDocument();
       }
     );
+  });
+
+  describe('User interactions', () => {
+    it('should call onClose when close (cancel) button is clicked', () => {
+      // Arrange
+      const mockOnClose = vi.fn();
+      const mockProps = createMockProps({ onClose: mockOnClose });
+
+      // Act
+      render(<ConfirmationDialogComponent {...mockProps} />);
+      const closeButton = screen.getByRole('button', { name: 'Cancel' });
+      fireEvent.click(closeButton);
+
+      // Assert
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
   });
 });
