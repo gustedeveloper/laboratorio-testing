@@ -142,46 +142,77 @@ describe('ConfirmationDialogComponent', () => {
       expect(mockOnAccept).toHaveBeenCalledBefore(mockOnClose);
     });
   });
-});
 
-describe('Dynamic children content rendering', () => {
-  it.each([
-    {
-      children: 'Simple text content',
-      type: 'text',
-      expectedTexts: ['Simple text content'],
-    },
-    {
-      children: <p>Paragraph content</p>,
-      type: 'single element',
-      expectedTexts: ['Paragraph content'],
-    },
-    {
-      children: (
-        <div>
-          <p>Multiple</p>
-          <span>Elements</span>
-        </div>
-      ),
-      type: 'multiple elements',
-      expectedTexts: ['Multiple', 'Elements'],
-    },
-  ])(
-    'should render $type children correctly',
-    ({ children, expectedTexts }) => {
+  describe('Dynamic children content rendering', () => {
+    it.each([
+      {
+        children: 'Simple text content',
+        type: 'text',
+        expectedTexts: ['Simple text content'],
+      },
+      {
+        children: <p>Paragraph content</p>,
+        type: 'single element',
+        expectedTexts: ['Paragraph content'],
+      },
+      {
+        children: (
+          <div>
+            <p>Multiple</p>
+            <span>Elements</span>
+          </div>
+        ),
+        type: 'multiple elements',
+        expectedTexts: ['Multiple', 'Elements'],
+      },
+    ])(
+      'should render $type children correctly',
+      ({ children, expectedTexts }) => {
+        // Arrange
+        const mockProps = createMockProps({ children });
+
+        // Act
+        render(<ConfirmationDialogComponent {...mockProps} />);
+
+        // Assert
+        const dialog = screen.getByRole('dialog');
+        expect(dialog).toBeInTheDocument();
+
+        expectedTexts.forEach((text) => {
+          expect(screen.getByText(text)).toBeInTheDocument();
+        });
+      }
+    );
+  });
+  describe('Unexpected children values', () => {
+    it.each([
+      {
+        scenario: 'null children',
+        props: { children: null },
+        expectError: false,
+      },
+      {
+        scenario: 'undefined children',
+        props: { children: undefined },
+        expectError: false,
+      },
+    ])('should handle $scenario', ({ props, expectError }) => {
       // Arrange
-      const mockProps = createMockProps({ children });
+      const mockProps = createMockProps(props);
 
-      // Act
-      render(<ConfirmationDialogComponent {...mockProps} />);
+      if (expectError) {
+        // Act & Assert for error cases
+        expect(() => {
+          render(<ConfirmationDialogComponent {...mockProps} />);
+        }).toThrow();
+      } else {
+        // Act
+        render(<ConfirmationDialogComponent {...mockProps} />);
 
-      // Assert
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toBeInTheDocument();
-
-      expectedTexts.forEach((text) => {
-        expect(screen.getByText(text)).toBeInTheDocument();
-      });
-    }
-  );
+        // Assert
+        const dialog = screen.getByRole('dialog');
+        expect(dialog).toBeInTheDocument();
+      }
+    });
+  });
 });
