@@ -184,6 +184,7 @@ describe('ConfirmationDialogComponent', () => {
       }
     );
   });
+
   describe('Unexpected children values', () => {
     it.each([
       {
@@ -214,5 +215,39 @@ describe('ConfirmationDialogComponent', () => {
         expect(dialog).toBeInTheDocument();
       }
     });
+  });
+
+  it('should have correct accessibility attributes', () => {
+    // Arrange
+    const mockProps = createMockProps({
+      title: 'Accessible Dialog Title',
+      labels: {
+        closeButton: 'Cancel',
+        acceptButton: 'Confirm',
+      },
+    });
+
+    // Act
+    render(<ConfirmationDialogComponent {...mockProps} />);
+
+    // Assert
+
+    // role="dialog"
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+
+    // 2. title aria-labelledby
+    const titleEl = screen.getByText('Accessible Dialog Title');
+    expect(titleEl).toHaveAttribute('id');
+
+    const labelledById = titleEl.getAttribute('id');
+    expect(dialog).toHaveAttribute('aria-labelledby', labelledById);
+
+    // 3. accesible buttons text
+    const closeBtn = screen.getByRole('button', { name: 'Cancel' });
+    const acceptBtn = screen.getByRole('button', { name: 'Confirm' });
+
+    expect(closeBtn).toBeVisible();
+    expect(acceptBtn).toBeVisible();
   });
 });
