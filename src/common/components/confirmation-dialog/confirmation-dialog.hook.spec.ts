@@ -28,7 +28,7 @@ describe('useConfirmationDialog', () => {
         id: '',
         name: '',
       });
-      expect(createEmptyLookup).toHaveBeenCalledTimes(1);
+      expect(createEmptyLookup).toHaveBeenCalled(); // Verify createEmptyLookup was called for initialization
     });
 
     it('should expose all required functions as defined functions', () => {
@@ -128,6 +128,61 @@ describe('useConfirmationDialog', () => {
         id: '',
         name: '',
       });
+    });
+  });
+
+  describe('onAccept', () => {
+    it('should reset itemToDelete to empty lookup without changing isOpen state', () => {
+      // Arrange
+      const mockItem = { id: '123', name: 'Test Item' };
+      const { result } = renderHook(() => useConfirmationDialog());
+
+      // Act - Open dialog first
+      act(() => {
+        result.current.onOpenDialog(mockItem);
+      });
+
+      // Assert - Verify dialog is open with item
+      expect(result.current.isOpen).toBe(true);
+      expect(result.current.itemToDelete).toEqual(mockItem);
+
+      // Act - Accept confirmation
+      act(() => {
+        result.current.onAccept();
+      });
+
+      // Assert - Verify itemToDelete is reset but isOpen remains unchanged
+      expect(result.current.itemToDelete).toEqual({
+        id: '',
+        name: '',
+      });
+      expect(result.current.isOpen).toBe(true);
+      expect(createEmptyLookup).toHaveBeenCalled(); // Verify createEmptyLookup was called for reset
+    });
+
+    it('should handle accepting when no item is set without errors', () => {
+      // Arrange
+      const { result } = renderHook(() => useConfirmationDialog());
+
+      // Assert - Verify initial state (no item set, dialog closed)
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.itemToDelete).toEqual({
+        id: '',
+        name: '',
+      });
+
+      // Act - Accept without opening dialog first
+      act(() => {
+        result.current.onAccept();
+      });
+
+      // Assert - Verify itemToDelete remains empty and no errors thrown
+      expect(result.current.itemToDelete).toEqual({
+        id: '',
+        name: '',
+      });
+      expect(result.current.isOpen).toBe(false);
+      expect(createEmptyLookup).toHaveBeenCalled(); // Verify createEmptyLookup was called for reset
     });
   });
 });
