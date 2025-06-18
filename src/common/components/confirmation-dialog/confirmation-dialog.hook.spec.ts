@@ -84,4 +84,50 @@ describe('useConfirmationDialog', () => {
       expect(result.current.itemToDelete).not.toEqual(firstItem);
     });
   });
+
+  describe('onClose', () => {
+    it('should close dialog while keeping itemToDelete unchanged', () => {
+      // Arrange
+      const mockItem = { id: '123', name: 'Test Item' };
+      const { result } = renderHook(() => useConfirmationDialog());
+
+      // Act - Open dialog first
+      act(() => {
+        result.current.onOpenDialog(mockItem);
+      });
+
+      // Assert - Verify dialog is open
+      expect(result.current.isOpen).toBe(true);
+      expect(result.current.itemToDelete).toEqual(mockItem);
+
+      // Act - Close dialog
+      act(() => {
+        result.current.onClose();
+      });
+
+      // Assert - Verify dialog is closed but item remains
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.itemToDelete).toEqual(mockItem);
+    });
+
+    it('should handle closing already closed dialog without issues', () => {
+      // Arrange
+      const { result } = renderHook(() => useConfirmationDialog());
+
+      // Assert - Verify initial state (dialog is closed)
+      expect(result.current.isOpen).toBe(false);
+
+      // Act - Close already closed dialog
+      act(() => {
+        result.current.onClose();
+      });
+
+      // Assert - Verify state remains consistent
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.itemToDelete).toEqual({
+        id: '',
+        name: '',
+      });
+    });
+  });
 });
