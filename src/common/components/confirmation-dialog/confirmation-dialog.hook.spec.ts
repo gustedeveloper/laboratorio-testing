@@ -185,4 +185,98 @@ describe('useConfirmationDialog', () => {
       expect(createEmptyLookup).toHaveBeenCalled(); // Verify createEmptyLookup was called for reset
     });
   });
+
+  describe('Complete Workflows', () => {
+    it('should handle full dialog workflow correctly', () => {
+      // Arrange
+      const firstItem = { id: '123', name: 'First Item' };
+      const secondItem = { id: '456', name: 'Second Item' };
+      const { result } = renderHook(() => useConfirmationDialog());
+
+      // Assert - Start with initial state
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.itemToDelete).toEqual({
+        id: '',
+        name: '',
+      });
+
+      // Act - Open dialog with first item
+      act(() => {
+        result.current.onOpenDialog(firstItem);
+      });
+
+      // Assert - Verify state after opening
+      expect(result.current.isOpen).toBe(true);
+      expect(result.current.itemToDelete).toEqual(firstItem);
+
+      // Act - Close dialog
+      act(() => {
+        result.current.onClose();
+      });
+
+      // Assert - Verify state after closing
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.itemToDelete).toEqual(firstItem); // Item should remain
+
+      // Act - Open dialog with different item
+      act(() => {
+        result.current.onOpenDialog(secondItem);
+      });
+
+      // Assert - Verify state after opening with new item
+      expect(result.current.isOpen).toBe(true);
+      expect(result.current.itemToDelete).toEqual(secondItem);
+
+      // Act - Accept confirmation
+      act(() => {
+        result.current.onAccept();
+      });
+
+      // Assert - Verify final state after accept
+      expect(result.current.isOpen).toBe(true); // Still open
+      expect(result.current.itemToDelete).toEqual({
+        id: '',
+        name: '',
+      }); // Item cleared
+    });
+
+    it('should handle accept and close workflow correctly', () => {
+      // Arrange
+      const mockItem = { id: '789', name: 'Test Item' };
+      const { result } = renderHook(() => useConfirmationDialog());
+
+      // Act - Open dialog with item
+      act(() => {
+        result.current.onOpenDialog(mockItem);
+      });
+
+      // Assert - Verify dialog is open with item
+      expect(result.current.isOpen).toBe(true);
+      expect(result.current.itemToDelete).toEqual(mockItem);
+
+      // Act - Accept confirmation
+      act(() => {
+        result.current.onAccept();
+      });
+
+      // Assert - Verify item is cleared but dialog still open
+      expect(result.current.isOpen).toBe(true);
+      expect(result.current.itemToDelete).toEqual({
+        id: '',
+        name: '',
+      });
+
+      // Act - Close dialog
+      act(() => {
+        result.current.onClose();
+      });
+
+      // Assert - Verify final state: dialog closed, item empty
+      expect(result.current.isOpen).toBe(false);
+      expect(result.current.itemToDelete).toEqual({
+        id: '',
+        name: '',
+      });
+    });
+  });
 });
