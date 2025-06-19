@@ -279,4 +279,53 @@ describe('useConfirmationDialog', () => {
       });
     });
   });
+
+  describe('Edge Cases and Error Handling', () => {
+    describe('Invalid or unexpected item values', () => {
+      it.each([
+        { value: null, description: 'null' },
+        { value: undefined, description: 'undefined' },
+      ])(
+        'should handle onOpenDialog called with $description without throwing',
+        ({ value }) => {
+          // Arrange
+          const { result } = renderHook(() => useConfirmationDialog());
+
+          // Act & Assert
+          expect(() => {
+            act(() => {
+              result.current.onOpenDialog(value as any);
+            });
+          }).not.toThrow();
+
+          // Should be open with value stored
+          expect(result.current.isOpen).toBe(true);
+          expect(result.current.itemToDelete).toBe(value);
+        }
+      );
+    });
+
+    describe('Rapid state changes (stress test)', () => {
+      it('should handle a full rapid sequence without inconsistent state', () => {
+        // Arrange
+        const { result } = renderHook(() => useConfirmationDialog());
+        const itemA = { id: 'A', name: 'Item A' };
+        const itemB = { id: 'B', name: 'Item B' };
+
+        // Act - simulate chaotic user interaction
+        act(() => {
+          result.current.onOpenDialog(itemA); // open with A
+          result.current.onClose(); // close
+          result.current.onOpenDialog(itemB); // open with B
+          result.current.onAccept(); // accept B (cleared)
+          result.current.onClose(); // close
+          result.current.onOpenDialog(itemA); // open with A again
+        });
+
+        // Assert - final state should be clean and consistent
+        expect(result.current.isOpen).toBe(true);
+        expect(result.current.itemToDelete).toEqual(itemA);
+      });
+    });
+  });
 });
