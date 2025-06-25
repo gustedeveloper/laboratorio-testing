@@ -1,4 +1,5 @@
 import { mockProjectList } from '../../src/pods/project-list/api/project-list.mock-data';
+import '@testing-library/cypress/add-commands';
 
 const projectListEndPoint = '/projects';
 
@@ -140,6 +141,57 @@ describe('Project List Scene specs', () => {
         cy.get('[data-testid="DeleteIcon"]')
           .should('have.length', 5)
           .and('be.visible');
+      });
+    });
+
+    describe('Edit button behavior', () => {
+      it('should navigate to the edit view when clicking the first edit button', () => {
+        // Arrange
+
+        // Act
+        cy.get('[data-testid="EditIcon"]').first().click();
+
+        // Assert
+        cy.url().should('include', '/projects/1');
+        cy.contains('Datos').should('be.visible');
+      });
+    });
+
+    describe('Delete button behavior', () => {
+      beforeEach(() => {
+        cy.get('[data-testid="DeleteIcon"]').first().click();
+      });
+
+      it('should open confirmation dialog when clicking the first delete button', () => {
+        // Arrange
+
+        // Act
+
+        // Assert
+        cy.findByRole('dialog').should('be.visible');
+        cy.contains('¿Seguro que quiere borrar a Bankia?').should('be.visible');
+      });
+
+      it('should close the dialog when clicking "Cancelar"', () => {
+        // Arrange
+
+        // Act
+
+        // Assert
+        cy.findByRole('button', { name: 'Cancelar' }).click();
+        cy.findByRole('dialog').should('not.exist');
+        cy.contains('Bankia').should('exist');
+      });
+
+      it('should delete the project when clicking "Aceptar"', () => {
+        // Arrange
+
+        // Act
+
+        // Assert
+        cy.findByRole('button', { name: 'Aceptar' }).click();
+        cy.findByRole('dialog').should('not.exist');
+        cy.contains('Bankia').should('not.exist');
       });
     });
   });
