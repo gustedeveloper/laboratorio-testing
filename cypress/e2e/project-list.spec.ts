@@ -12,20 +12,18 @@ const tableHeaders = [
 ];
 
 describe('Project List Scene specs', () => {
+  beforeEach(() => {
+    cy.visit(projectListEndPoint);
+  });
+
   it('should visit project list page', () => {
     // Arrange
-
     // Act
-    cy.visit(projectListEndPoint);
-
+    // It visits project list page with previous beforeEach
     // Assert
   });
 
   describe('Table Structure', () => {
-    beforeEach(() => {
-      cy.visit(projectListEndPoint);
-    });
-
     it('should display table', () => {
       // Arrange
 
@@ -49,10 +47,6 @@ describe('Project List Scene specs', () => {
   });
 
   describe('Data Display', () => {
-    beforeEach(() => {
-      cy.visit(projectListEndPoint);
-    });
-
     const visibleProjects = mockProjectList.slice(0, 5);
 
     describe('Project values', () => {
@@ -122,10 +116,6 @@ describe('Project List Scene specs', () => {
   });
 
   describe('Action Buttons', () => {
-    beforeEach(() => {
-      cy.visit(projectListEndPoint);
-    });
-
     describe('Button visibility', () => {
       it('should display one edit and one delete button per project row', () => {
         // Arrange
@@ -197,10 +187,6 @@ describe('Project List Scene specs', () => {
   });
 
   describe('Primary Action Button "Nuevo proyecto"', () => {
-    beforeEach(() => {
-      cy.visit(projectListEndPoint);
-    });
-
     it('should display the "Nuevo proyecto" button', () => {
       // Arrange
 
