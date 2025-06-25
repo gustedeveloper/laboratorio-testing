@@ -119,4 +119,28 @@ describe('Project List Scene specs', () => {
       });
     });
   });
+
+  describe('Action Buttons', () => {
+    beforeEach(() => {
+      cy.visit(projectListEndPoint);
+    });
+
+    describe('Button visibility', () => {
+      it('should display one edit and one delete button per project row', () => {
+        // Arrange
+
+        // Act
+
+        // Assert
+
+        cy.get('[data-testid="EditIcon"]')
+          .should('have.length', 5)
+          .and('be.visible');
+
+        cy.get('[data-testid="DeleteIcon"]')
+          .should('have.length', 5)
+          .and('be.visible');
+      });
+    });
+  });
 });
