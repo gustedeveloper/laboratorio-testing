@@ -195,4 +195,29 @@ describe('Project List Scene specs', () => {
       });
     });
   });
+
+  describe('Primary Action Button "Nuevo proyecto"', () => {
+    beforeEach(() => {
+      cy.visit(projectListEndPoint);
+    });
+
+    it('should display the "Nuevo proyecto" button', () => {
+      // Arrange
+
+      // Act
+
+      // Assert
+      cy.contains('button', 'Nuevo proyecto').should('be.visible');
+    });
+
+    it('should navigate to create project page on click', () => {
+      // Arrange
+
+      // Act
+      cy.contains('button', 'Nuevo proyecto').click();
+
+      // Assert
+      cy.url().should('include', '/projects/0');
+    });
+  });
 });
