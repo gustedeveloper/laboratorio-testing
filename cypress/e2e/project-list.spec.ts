@@ -242,4 +242,87 @@ describe('Project List Scene specs', () => {
       cy.get('tbody tr').should('have.length', 5);
     });
   });
+
+  describe('Pagination', () => {
+    const nextPageProjects = mockProjectList.slice(5);
+
+    it('should display pagination controls', () => {
+      // Arrange
+
+      // Act
+
+      // Assert
+      cy.get('nav[aria-label="pagination navigation"]').should('be.visible');
+
+      cy.get('button[aria-label="Go to previous page"]').should('exist');
+      cy.get('button[aria-label="Go to next page"]').should('exist');
+
+      cy.contains('button', '1').should('exist');
+      cy.contains('button', '2').should('exist');
+    });
+
+    it('should display different projects on page 2', () => {
+      // Arrange
+
+      // Act
+      cy.contains('button', '2').click();
+
+      // Assert
+      cy.get('tbody tr').should('have.length', nextPageProjects.length);
+
+      nextPageProjects.forEach((project) => {
+        cy.contains(project.code).should('be.visible');
+      });
+
+      visibleProjects.forEach((project) => {
+        cy.contains(project.code).should('not.exist');
+      });
+    });
+
+    it('should return to page 1 and display initial projects again', () => {
+      // Arrange
+
+      // Act
+      cy.contains('button', '2').click();
+      cy.contains('button', '1').click();
+
+      // Assert
+      visibleProjects.forEach((project) => {
+        cy.contains(project.code).should('be.visible');
+      });
+    });
+
+    it('should navigate to next page when clicking "Go to next page" button', () => {
+      // Arrange
+
+      // Act
+      cy.get('button[aria-label="Go to next page"]').click();
+
+      // Assert
+      nextPageProjects.forEach((project) => {
+        cy.contains(project.code).should('be.visible');
+      });
+
+      visibleProjects.forEach((project) => {
+        cy.contains(project.code).should('not.exist');
+      });
+    });
+
+    it('should return to previous page when clicking "Go to previous page" button', () => {
+      // Arrange
+
+      // Act
+      cy.get('button[aria-label="Go to next page"]').click(); //
+      cy.get('button[aria-label="Go to previous page"]').click();
+
+      // Assert
+      visibleProjects.forEach((project) => {
+        cy.contains(project.code).should('be.visible');
+      });
+
+      nextPageProjects.forEach((project) => {
+        cy.contains(project.code).should('not.exist');
+      });
+    });
+  });
 });
