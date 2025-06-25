@@ -2,6 +2,7 @@ import { mockProjectList } from '../../src/pods/project-list/api/project-list.mo
 import '@testing-library/cypress/add-commands';
 
 const projectListEndPoint = '/projects';
+const visibleProjects = mockProjectList.slice(0, 5);
 
 const tableHeaders = [
   'Activo',
@@ -47,8 +48,6 @@ describe('Project List Scene specs', () => {
   });
 
   describe('Data Display', () => {
-    const visibleProjects = mockProjectList.slice(0, 5);
-
     describe('Project values', () => {
       it('should display project codes correctly', () => {
         // Arrange
@@ -204,6 +203,43 @@ describe('Project List Scene specs', () => {
 
       // Assert
       cy.url().should('include', '/projects/0');
+    });
+  });
+
+  describe('Search Bar', () => {
+    const searchInputPlaceholder = 'Buscar proyecto';
+
+    it('should focus the input when clicked', () => {
+      // Arrange
+
+      // Act
+      cy.findByPlaceholderText(searchInputPlaceholder).click();
+
+      // Assert
+      cy.findByPlaceholderText(searchInputPlaceholder).should('have.focus');
+    });
+
+    it('should filter projects by name as user types', () => {
+      const projectToFind = visibleProjects[2].name;
+
+      cy.findByPlaceholderText(searchInputPlaceholder).type(projectToFind);
+
+      cy.get('tbody tr').should('have.length', 1);
+      cy.contains(projectToFind).should('be.visible');
+    });
+
+    it('should show no results for unmatched search', () => {
+      cy.findByPlaceholderText(searchInputPlaceholder).type('no results');
+
+      cy.get('tbody tr').should('have.length', 0);
+    });
+
+    it('should reset the filtered list when input is cleared', () => {
+      cy.findByPlaceholderText(searchInputPlaceholder).type('Bankia');
+      cy.get('tbody tr').should('have.length', 1);
+
+      cy.findByPlaceholderText(searchInputPlaceholder).clear();
+      cy.get('tbody tr').should('have.length', 5);
     });
   });
 });
