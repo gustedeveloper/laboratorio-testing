@@ -21,11 +21,14 @@ describe('Project List Scene specs', () => {
   });
 
   describe('Table Structure', () => {
+    beforeEach(() => {
+      cy.visit(projectListEndPoint);
+    });
+
     it('should display table', () => {
       // Arrange
 
       // Act
-      cy.visit(projectListEndPoint);
 
       // Assert
       cy.get('table').should('exist');
@@ -35,7 +38,6 @@ describe('Project List Scene specs', () => {
       // Arrange
 
       // Act
-      cy.visit(projectListEndPoint);
 
       // Assert
       cy.get('table').should('exist');
@@ -46,6 +48,10 @@ describe('Project List Scene specs', () => {
   });
 
   describe('Data Display', () => {
+    beforeEach(() => {
+      cy.visit(projectListEndPoint);
+    });
+
     const visibleProjects = mockProjectList.slice(0, 5);
 
     describe('Project values', () => {
@@ -53,7 +59,6 @@ describe('Project List Scene specs', () => {
         // Arrange
 
         // Act
-        cy.visit(projectListEndPoint);
 
         // Assert
         visibleProjects.forEach((project) => {
@@ -65,7 +70,6 @@ describe('Project List Scene specs', () => {
         // Arrange
 
         // Act
-        cy.visit(projectListEndPoint);
 
         // Assert
         visibleProjects.forEach((project) => {
@@ -77,7 +81,6 @@ describe('Project List Scene specs', () => {
         // Arrange
 
         // Act
-        cy.visit(projectListEndPoint);
 
         // Assert
         cy.get('tbody tr').each(($row, index) => {
@@ -96,7 +99,6 @@ describe('Project List Scene specs', () => {
         // Arrange
 
         // Act
-        cy.visit(projectListEndPoint);
 
         // Assert
         // Check checkboxes exist and are disabled
