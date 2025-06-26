@@ -2,21 +2,32 @@ import { mapToCollection } from '#common/mappers';
 import * as apiModel from './api/project.api-model';
 import * as viewModel from './project.vm';
 
-const mapEmployeeSummaryFromApiToVm = (
+export const mapEmployeeSummaryFromApiToVm = (
   employeeSummary: apiModel.EmployeeSummary
 ): viewModel.EmployeeSummary => ({
   ...employeeSummary,
 });
 
-const mapEmployeeSummaryListFromApiToVm = (
+export const mapEmployeeSummaryListFromApiToVm = (
   employeeSummary: apiModel.EmployeeSummary[]
 ): viewModel.EmployeeSummary[] =>
-  mapToCollection(employeeSummary, es => mapEmployeeSummaryFromApiToVm(es));
+  mapToCollection(employeeSummary, (es) => mapEmployeeSummaryFromApiToVm(es));
+
+const isValidProject = (project: any): project is apiModel.Project => {
+  return (
+    project !== null &&
+    project !== undefined &&
+    typeof project === 'object' &&
+    !Array.isArray(project) &&
+    typeof project.id === 'string' &&
+    project.id.length > 0
+  );
+};
 
 export const mapProjectFromApiToVm = (
   project: apiModel.Project
 ): viewModel.Project => {
-  return Boolean(project)
+  return isValidProject(project)
     ? {
         ...project,
         employees: mapEmployeeSummaryListFromApiToVm(project.employees),

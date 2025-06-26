@@ -8,3 +8,5 @@ junit.xml
 *.orig
 .awcache
 public
+cypress/screenshots
+cypress/videos
